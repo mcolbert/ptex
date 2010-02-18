@@ -13,7 +13,12 @@ CXXFLAGS = -Wall -W -pedantic -std=c++98 $(DEBUG) $(INCPATH) -fPIC
 PTEX     = ../ptex/libPtex.a
 LIBS     = -lm -lz -lpthread 
 
-TESTS = halftest wtest rtest ftest
+ifdef PTEX_STATIC
+CXXFLAGS += -DPTEX_STATIC
+endif
+
+
+TESTS = halftest wtest ftest rtest
 
 tests: $(TESTS)
 	./run_tests.py

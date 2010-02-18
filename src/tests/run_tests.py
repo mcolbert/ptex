@@ -3,10 +3,11 @@ import os
 os.environ['PATH'] = ':'.join(['.', os.environ['PATH']])
 
 tests = ['wtest',
-         'rtest > rtest.dat && cmp rtest.dat rtestok.dat',
          'ftest > ftest.dat && cmp ftest.dat ftestok.dat',
          'halftest']
 
+if not os.environ.has_key('PRMAN_15_COMPATIBLE_PTEX'):
+    tests.append('rtest > rtest.dat && cmp rtest.dat rtestok.dat')
 
 failed = 0
 for test in tests:

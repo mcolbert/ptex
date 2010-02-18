@@ -10,9 +10,20 @@ endif
 DEBUG    = -O2 -DNDEBUG
 INCPATH  = -I.
 DEFINES  = 
+
+ifdef PRMAN_15_COMPATIBLE_PTEX
+DEFINES += -DPTEX_NO_LARGE_METADATA_BLOCKS
+endif
+
+ifdef PTEX_STATIC
+DEFINES += -DPTEX_STATIC
+endif
+
 CXXFLAGS = -Wall -pedantic -W -std=c++98 $(DEBUG) $(INCPATH) $(DEFINES) -fPIC
 LFLAGS   = 
 LIBS     = -lm -lz -lpthread
+
+
 
 SRCS = \
 	PtexCache.cpp \
@@ -32,13 +43,17 @@ INSTALLDIR = ../../install
 
 INSTALL = \
 	lib/libPtex.a \
-	lib/libPtex.so \
 	include/Ptexture.h \
 	include/PtexHalf.h \
 	include/PtexInt.h \
 	include/PtexUtils.h
 
-ALL = libPtex.a libPtex.so
+ALL = libPtex.a 
+
+ifndef PTEX_STATIC
+ALL += libPtex.so
+INSTALL += lib/libPtex.so
+endif
 
 $(INSTALLDIR)/lib/% : %
 	@ mkdir -p $(@D)
@@ -59,10 +74,16 @@ all: $(ALL)
 clean:
 	rm -f *.o $(ALL)
 
+ifdef PTEX_STATIC
+libPtex.a : libPtex.a($(OBJECTS))
+	ar -r $@
+    
+else
 libPtex.a : libPtex.a($(OBJECTS))
 
 libPtex.so: $(OBJECTS)
 	$(LINK) $(LFLAGS) -shared -o $@ $(OBJECTS) $(LIBS)
+endif
 
 depend:
 	$(CXX) -MM $(SRCS) > Makefile.deps
